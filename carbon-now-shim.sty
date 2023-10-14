@@ -1,0 +1,27 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{carbon-now-shim}[2023/10/14 v1.0.0 Carbon Now Shim]
+
+\RequirePackage{shellesc}
+\RequirePackage{graphicx}
+\RequirePackage{xkeyval}
+
+\DeclareOptionX{outputdir}{\def\minted@outputdir{#1}}
+\ExecuteOptionsX{outputdir=.}%
+\ProcessOptionsX\relax
+
+\newcommand{\includeCarbonGraphics}[2][]{
+\immediate\write18{
+    mkdir -p \minted@outputdir/carbon
+}
+\immediate\write18{
+echo '{"default": {
+"paddingVertical": "0",
+"paddingHorizontal": "0",
+"backgroundColor": "white"
+}}' > \minted@outputdir/carbon/config.json
+}
+\immediate\write18{
+    npx carbon-now-cli #2 --config \minted@outputdir/carbon/config.json -p default --save-as somecode --save-to \minted@outputdir/carbon/
+}
+\includegraphics[#1]{\minted@outputdir/carbon/somecode.png}
+}
